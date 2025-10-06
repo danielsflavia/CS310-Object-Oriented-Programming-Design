@@ -19,7 +19,6 @@ int main() {
                 break;
             }
         }
-    
 
     if(prime) {
         cout << setw(5) << number;
