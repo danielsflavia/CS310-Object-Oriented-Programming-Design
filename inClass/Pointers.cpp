@@ -2,6 +2,12 @@
 
 using namespace std;
 
+void swapByPointer(int* pA, int* pB) {
+    int temp = *pA;
+    *pA = *pB;
+    *pB = temp;
+}
+
 int main() {
     int a =5;
     int grades[3]={100,80,50};
@@ -35,8 +41,15 @@ int main() {
     double balance = 100;
     double* pDouble = &balance; 
 
+
     int* pA, *pB;
     int c = 2, b = 3;
+
+
+    swapByPointer(&c, &b);
+    cout<< "c and b are swapped, c="
+        << c << ",b="<< b<<endl;
+        
     pA = &c;
     pB = &b;
 
@@ -47,11 +60,17 @@ int main() {
     cout << "pA points to " << *pA  
         << ", pB points to "<< *pB << endl;
 
+    cout << grades << '\t' << grades << endl;
+    cout<< grades+1
+        << '\t'<< *(grades+1)
+        << endl;
+
+    pInt = grades;
+    pInt++;
+
+
 
     return 0;
-
-
-
 
     
 }
