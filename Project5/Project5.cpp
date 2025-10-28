@@ -1,29 +1,27 @@
 /*
  * Flavia Daniels
- * Project 4: Fitness Tracker
+ * Project 5: Fitness Tracker (Dynamic Arrays)
  * Description:
- *   This program tracks and stores up to 7 days of fitness data.
+ *   This program tracks and stores an unlimited number of days of fitness data.
  *   It records and displays name, gender, age, height, weight, BMI, exercise type, and exercise time.
- *   The program uses functions, fixed-size arrays, and no global variables.
+ *   The program uses functions, dynamic arrays, and no structures or vectors.
  */
 
+#include <iostream>
+#include <string>
+#include <iomanip>
+#include <limits>
 
- #include <iostream>
- #include <string>
- #include <iomanip>
- #include <limits>
+using namespace std;
 
- using namespace std;
-
- // FUcntion Template getInput
-
- template <typename T>
+// Function Template getInput
+template <typename T>
 T getInput(const string& prompt, T minVal, T maxVal) {
     T value;
-    while(true){
+    while (true) {
         cout << prompt;
         cin >> value;
-        if(cin.fail() || value < minVal || value > maxVal) {
+        if (cin.fail() || value < minVal || value > maxVal) {
             cin.clear();
             cin.ignore(numeric_limits<streamsize>::max(), '\n');
             cout << "Invalid input. Please enter a valid value." << endl;
@@ -39,7 +37,7 @@ string getInput<string>(const string& prompt, string minVal, string maxVal) {
     string value;
     cout << prompt;
     getline(cin, value);
-    while(value.empty()) {
+    while (value.empty()) {
         cout << "Invalid input. Please enter a non-empty string." << endl;
         cout << prompt;
         getline(cin, value);
@@ -47,37 +45,39 @@ string getInput<string>(const string& prompt, string minVal, string maxVal) {
     return value;
 }
 
+// Function Template resizeArray
+template <typename T>
+void resizeArray(T*& arr, int& capacity) {
+    int newCapacity = capacity * 2;
+    T* newArr = new T[newCapacity];
+    for (int i = 0; i < capacity; ++i) {
+        newArr[i] = arr[i];
+    }
+    delete[] arr;
+    arr = newArr;
+    capacity = newCapacity;
+}
+
+// Function declarations
 void getBasicInfo(string& name, char& gender, int& age, double& height);
 void printMenu();
 int getOption();
-void addData(double weights[], string exercises[], int times[], int& count, int maxSize);
+void inputData(double*& weights, string*& exercises, int*& times, int& count, int& capacity);
 void printRecentData(const string& name, char gender, int age, double height,
                      const double weights[], const string exercises[], const int times[], int count);
 void printHistoryData(const string& name, char gender, int age, double height,
                       const double weights[], const string exercises[], const int times[], int count);
 double calculateBMI(double weight, double height);
-
-
-// functions declared
-void getBasicInfo(string& name, char& gender, int& age, double& height);
-void printMenu();
-int getOption();
-void addData(double weights[], string exercises[], int times[], int& count, int maxSize);
-void printRecentData(const string& name, char gender, int age, double height,
-                     const double weights[], const string exercises[], const int times[], int count);
-void printHistoryData(const string& name, char gender, int age, double height,
-                      const double weights[], const string exercises[], const int times[], int count);
-double calculateBMI(double weight, double height);
-
+int calculateTotalExercise(const int times[], int count);
 
 // main
-
 int main() {
-    const int MAX_DAYS = 7;
-    double weights[MAX_DAYS];
-    string exercises[MAX_DAYS];
-    int times[MAX_DAYS];
+    int capacity = 7;  // initial capacity
     int count = 0;
+
+    double* weights = new double[capacity];
+    string* exercises = new string[capacity];
+    int* times = new int[capacity];
 
     string name;
     char gender;
@@ -93,7 +93,7 @@ int main() {
 
         switch (option) {
             case 1:
-                addData(weights, exercises, times, count, MAX_DAYS);
+                inputData(weights, exercises, times, count, capacity);
                 break;
             case 2:
                 printRecentData(name, gender, age, height, weights, exercises, times, count);
@@ -106,9 +106,13 @@ int main() {
                 break;
         }
     } while (option != 4);
+
+    delete[] weights;
+    delete[] exercises;
+    delete[] times;
+
     return 0;
 }
-
 
 // Function definitions
 
@@ -151,31 +155,25 @@ int getOption() {
     }
 }
 
-
-void addData(double weights[], string exercises[], int times[], int& count, int maxSize) {
+void inputData(double*& weights, string*& exercises, int*& times, int& count, int& capacity) {
     double newWeight = getInput<double>("Enter your weight today (kg): ", 1.0, 500.0);
     string newExercise = getInput<string>("Enter your exercise type today: ", "", "");
     int newTime = getInput<int>("Enter your exercise time today (mins): ", 0, 1440);
 
-    if (count == maxSize) {
-        for (int i = 1; i < maxSize; i++) {
-            weights[i - 1] = weights[i];
-            exercises[i - 1] = exercises[i];
-            times[i - 1] = times[i];
-        }
-        weights[maxSize - 1] = newWeight;
-        exercises[maxSize - 1] = newExercise;
-        times[maxSize - 1] = newTime;
-    } else {
-        weights[count] = newWeight;
-        exercises[count] = newExercise;
-        times[count] = newTime;
-        count++;
+    // Resize if full
+    if (count == capacity) {
+        resizeArray(weights, capacity);
+        resizeArray(exercises, capacity);
+        resizeArray(times, capacity);
     }
+
+    weights[count] = newWeight;
+    exercises[count] = newExercise;
+    times[count] = newTime;
+    count++;
 
     cout << "Data is recorded successfully" << endl;
 }
-
 
 void printRecentData(const string& name, char gender, int age, double height,
                      const double weights[], const string exercises[], const int times[], int count) {
@@ -208,7 +206,6 @@ void printHistoryData(const string& name, char gender, int age, double height,
 
     cout << "\nFitness History (Most Recent to Oldest):\n" << endl;
 
-    double totalExercise = 0;
     for (int i = count - 1; i >= 0; i--) {
         double bmi = calculateBMI(weights[i], height);
         cout << "Day " << (count - i) << ":" << endl;
@@ -217,12 +214,12 @@ void printHistoryData(const string& name, char gender, int age, double height,
         cout << "  Exercise: " << exercises[i]
              << " (" << times[i] << " mins)" << endl;
         cout << "--------------------------------------" << endl;
-        totalExercise += times[i];
     }
 
     double firstBMI = calculateBMI(weights[0], height);
     double lastBMI = calculateBMI(weights[count - 1], height);
     double bmiChange = lastBMI - firstBMI;
+    int totalExercise = calculateTotalExercise(times, count);
 
     cout << fixed << setprecision(1);
     cout << "\nProgress Summary:" << endl;
@@ -233,4 +230,12 @@ void printHistoryData(const string& name, char gender, int age, double height,
 
 double calculateBMI(double weight, double height) {
     return weight / (height * height);
+}
+
+int calculateTotalExercise(const int times[], int count) {
+    int total = 0;
+    for (int i = 0; i < count; i++) {
+        total += times[i];
+    }
+    return total;
 }
