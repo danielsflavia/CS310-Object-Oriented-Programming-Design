@@ -1,6 +1,6 @@
 /*
  * Flavia Daniels
- * Project 5: Fitness Tracker (Dynamic Arrays)
+ * Project 5: Fitness Tracker with Dynamic Arrays
  * Description:
  *   This program tracks and stores an unlimited number of days of fitness data.
  *   It records and displays name, gender, age, height, weight, BMI, exercise type, and exercise time.
@@ -32,6 +32,7 @@ T getInput(const string& prompt, T minVal, T maxVal) {
     }
 }
 
+// getInput for string. ensures that the user provides a non-empty string
 template <>
 string getInput<string>(const string& prompt, string minVal, string maxVal) {
     string value;
@@ -47,13 +48,13 @@ string getInput<string>(const string& prompt, string minVal, string maxVal) {
 
 // Function Template resizeArray
 template <typename T>
-void resizeArray(T*& arr, int& capacity) {
+void resizeArray(T*& arr, int& capacity) {  //Doubles the size of a dynamic array when full
     int newCapacity = capacity * 2;
     T* newArr = new T[newCapacity];
     for (int i = 0; i < capacity; ++i) {
         newArr[i] = arr[i];
     }
-    delete[] arr;
+    delete[] arr;   //deletes the old array, and updates the capacity variable
     arr = newArr;
     capacity = newCapacity;
 }
@@ -72,9 +73,10 @@ int calculateTotalExercise(const int times[], int count);
 
 // main
 int main() {
-    int capacity = 7;  // initial capacity
-    int count = 0;
+    int capacity = 7;  // initial capacity for dynamic arrays
+    int count = 0;  // current number of fitness records
 
+    // Dynamic array
     double* weights = new double[capacity];
     string* exercises = new string[capacity];
     int* times = new int[capacity];
@@ -84,8 +86,10 @@ int main() {
     int age;
     double height;
 
+    // gets user basic info
     getBasicInfo(name, gender, age, height);
 
+    //menu
     int option;
     do {
         printMenu();
@@ -107,6 +111,7 @@ int main() {
         }
     } while (option != 4);
 
+    // free dynamically allocated memory
     delete[] weights;
     delete[] exercises;
     delete[] times;
@@ -114,7 +119,7 @@ int main() {
     return 0;
 }
 
-// Function definitions
+// Function definitions 
 
 void getBasicInfo(string& name, char& gender, int& age, double& height) {
     name = getInput<string>("Enter your full name: ", "", "");
@@ -161,7 +166,7 @@ void inputData(double*& weights, string*& exercises, int*& times, int& count, in
     int newTime = getInput<int>("Enter your exercise time today (mins): ", 0, 1440);
 
     // Resize if full
-    if (count == capacity) {
+    if (count == capacity) {    
         resizeArray(weights, capacity);
         resizeArray(exercises, capacity);
         resizeArray(times, capacity);
@@ -178,7 +183,7 @@ void inputData(double*& weights, string*& exercises, int*& times, int& count, in
 void printRecentData(const string& name, char gender, int age, double height,
                      const double weights[], const string exercises[], const int times[], int count) {
     if (count == 0) {
-        cout << "There is no fitness data to print." << endl;
+        cout << "There is no fitness data to print." << endl; //If no data is available, displays a message instead.
         return;
     }
 
@@ -193,6 +198,7 @@ void printRecentData(const string& name, char gender, int age, double height,
          << " (" << times[count - 1] << " mins)" << endl;
 }
 
+// Prints all fitness records from most recent to oldest
 void printHistoryData(const string& name, char gender, int age, double height,
                       const double weights[], const string exercises[], const int times[], int count) {
     if (count == 0) {
@@ -213,9 +219,10 @@ void printHistoryData(const string& name, char gender, int age, double height,
              << " kg, BMI: " << fixed << setprecision(1) << bmi << " kg/m2" << endl;
         cout << "  Exercise: " << exercises[i]
              << " (" << times[i] << " mins)" << endl;
-        cout << "--------------------------------------" << endl;
+        cout << "-------------------------------------" << endl;
     }
 
+    // Calculates progress summary
     double firstBMI = calculateBMI(weights[0], height);
     double lastBMI = calculateBMI(weights[count - 1], height);
     double bmiChange = lastBMI - firstBMI;
