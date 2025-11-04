@@ -47,16 +47,15 @@ string getInput<string>(const string& prompt, string minVal, string maxVal) {
 }
 
 // Function Template resizeArray
+
 template <typename T>
-void resizeArray(T*& arr, int& capacity) {  //Doubles the size of a dynamic array when full
-    int newCapacity = capacity * 2;
+void resizeArray(T*& arr, int oldCapacity, int newCapacity) {
     T* newArr = new T[newCapacity];
-    for (int i = 0; i < capacity; ++i) {
+    for (int i = 0; i < oldCapacity; ++i) {
         newArr[i] = arr[i];
     }
-    delete[] arr;   //deletes the old array, and updates the capacity variable
-    arr = newArr;
-    capacity = newCapacity;
+    delete[] arr;  // deletes the old array
+    arr = newArr;  // updates pointer to the new array
 }
 
 // Function declarations
@@ -167,9 +166,16 @@ void inputData(double*& weights, string*& exercises, int*& times, int& count, in
 
     // Resize if full
     if (count == capacity) {    
-        resizeArray(weights, capacity);
-        resizeArray(exercises, capacity);
-        resizeArray(times, capacity);
+        int oldCapacity = capacity;
+        int newCapacity = capacity * 2;
+
+        // Resize using old capacity → new capacity
+        resizeArray(weights, oldCapacity, newCapacity);
+        resizeArray(exercises, oldCapacity, newCapacity);
+        resizeArray(times, oldCapacity, newCapacity);
+
+        // Update capacity only once 
+        capacity = newCapacity;
     }
 
     weights[count] = newWeight;
