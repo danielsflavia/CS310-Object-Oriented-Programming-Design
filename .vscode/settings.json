@@ -1,6 +1,9 @@
 {
     "files.associations": {
         "iostream": "cpp",
-        "typeinfo": "cpp"
+        "typeinfo": "cpp",
+        "__bit_reference": "cpp",
+        "ios": "cpp",
+        "print": "cpp"
     }
 }
