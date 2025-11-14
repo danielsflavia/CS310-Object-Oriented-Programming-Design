@@ -15,7 +15,9 @@ int main()
     c1.print();
 
 
-    Circle* p=new Circle(); //call no-arg constructor
+    Circle* p=new Circle(1.5, newCenter); 
+    
+    //call no-arg constructor
     p-> print();
     cout<< "if thwo circles =? "<< boolalpha
         << (c1 == *p) << endl;
